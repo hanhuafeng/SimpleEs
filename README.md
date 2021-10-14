@@ -13,10 +13,10 @@
 
 ## 软件运行截图如下
 
-![407DB58A-260C-4B32-931B-BDBD06EA1A03](pic/407DB58A-260C-4B32-931B-BDBD06EA1A03.png)
+![407DB58A-260C-4B32-931B-BDBD06EA1A03](https://raw.githubusercontent.com/hanhuafeng/pic_factory/master/407DB58A-260C-4B32-931B-BDBD06EA1A03.png)
 
-![image-20211014231213007](pic/image-20211014231213007.png)
+![image-20211014231213007](https://raw.githubusercontent.com/hanhuafeng/pic_factory/master/image-20211014231213007.png)
 
-![image-20211014231237944](pic/image-20211014231237944.png)
+![image-20211014231237944](https://raw.githubusercontent.com/hanhuafeng/pic_factory/master/image-20211014231237944.png)
 
-![image-20211014231318941](pic/image-20211014231318941.png)
+![image-20211014231318941](https://raw.githubusercontent.com/hanhuafeng/pic_factory/master/image-20211014231318941.png)
