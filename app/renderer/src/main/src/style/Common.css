@@ -1,0 +1,14 @@
+/* ./src/index.css */
+
+/*! @import */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@font-face {
+    font-family: myFirstFont;
+    src: url("../assets/font/LXGWWenKai-Regular.ttf");
+}
+@font-face {
+    font-family: LCD;
+    src: url("../assets/font/lcd.TTF");
+}
