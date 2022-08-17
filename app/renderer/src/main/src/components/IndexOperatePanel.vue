@@ -22,7 +22,9 @@
              :class="checkClassStyleByClickId(index+'-'+childIndex)"
              :key="childIndex"
              @dblclick="childDbClick(childItem,index+'-'+childIndex)"
-             @click="clickItem(item,index+'-'+childIndex)">
+             @click="clickItem(item,index+'-'+childIndex)"
+             @contextmenu.prevent="childOnContextmenu(childItem,index+'-'+childIndex)"
+        >
           <!--          <img :src="imgContainer.IndexIcon" alt="">-->
           <!--          <a :title="childItem.index" :style="'color:'+statusIconColor[childItem.health]">{{ childItem.index }}</a>-->
           <div class="status-bar" :style="'background-color:'+statusIconColor[childItem.health]"></div>
@@ -77,7 +79,10 @@ export default {
       selectClusterUuid: '',
       clickX: null,
       clickY: null,
-      isActive: false
+      isActive: false,
+      selectItem:null,
+      esConnectionInfo:null,
+      esClusterStatus: null
     }
   },
   created() {
@@ -215,11 +220,14 @@ export default {
       if (!!item.username && !!item.passwd) {
         setCookie('Authorization', Base64.encode(item.username + ':' + item.passwd), 7)
       }
+      this.selectItem = item
       setCookie('baseUrl', item.baseUrl, 7)
       if (!item.isActive) {
         item.loading = true
         this.elasticsearchResolver.loginToEs((esConnectionInfo) => {
+          that.esConnectionInfo = esConnectionInfo
           that.elasticsearchResolver.getEsClusterStatus((esClusterStatus) => {
+            that.esClusterStatus = esClusterStatus
             const color = esClusterStatus.status
             if (typeof color !== 'undefined' && color !== '') {
               item.status = that.statusIconColor['grey']
@@ -227,28 +235,7 @@ export default {
                 item.status = that.statusIconColor[color]
               }
             }
-            that.elasticsearchResolver.getAllIndex((callback) => {
-
-              item.children = callback
-              setTimeout(function () {
-                // 取消loading载入
-                item.loading = false
-                // 激活状态
-                that.itemList[id].isActive = true
-                // 激活下拉
-                that.itemList[id].down = true
-                // 设置ES信息内部的一些变量
-                item.esConnectionInfo = esConnectionInfo
-                item.esClusterInfo = esClusterStatus
-                item.allIndexInfo = callback
-                // 与HomePage交互，告诉他要数据修改
-                that.homePageInteractive(item)
-                // 设置当前选中的uuid
-                that.selectClusterUuid = item.esConnectionInfo.cluster_uuid
-              }, Math.round(Math.random() * 1000))
-            }, (error) => {
-              this.throwErrorMsg(error, item)
-            })
+            that.initIndexList()
           }, (error) => {
             this.throwErrorMsg(error, item)
           })
@@ -259,6 +246,34 @@ export default {
         // 激活下拉
         this.itemList[id].down = !this.itemList[id].down
       }
+    },
+    /**
+     * 初始化索引列表
+     */
+    initIndexList(){
+      let item = this.selectItem
+      let that = this
+      this.elasticsearchResolver.getAllIndex((callback) => {
+        item.children = callback
+        setTimeout(function () {
+          // 取消loading载入
+          item.loading = false
+          // 激活状态
+          that.itemList[that.clickId].isActive = true
+          // 激活下拉
+          that.itemList[that.clickId].down = true
+          // 设置ES信息内部的一些变量
+          item.esConnectionInfo = that.esConnectionInfo
+          item.esClusterInfo = that.esClusterStatus
+          item.allIndexInfo = callback
+          // 与HomePage交互，告诉他要数据修改
+          that.homePageInteractive(item)
+          // 设置当前选中的uuid
+          that.selectClusterUuid = item.esConnectionInfo.cluster_uuid
+        }, Math.round(Math.random() * 1000))
+      }, (error) => {
+        that.throwErrorMsg(error, item)
+      })
     },
     /**
      * 抛出异常信息的公共方法
@@ -272,7 +287,12 @@ export default {
       if (error.toString().indexOf('401') !== -1) {
         this.$message.error('ES认证错误：当前认证信息错误，请确认账号或密码是否有误');
       } else {
-        this.$message.error('ES连接错误：' + error);
+        // this.$message.error('ES操作错误：' + error);
+        try {
+          this.$message.error('ES操作错误：' + error.response.data.error.reason);
+        }catch (e){
+          this.$message.error('ES操作错误：' + error);
+        }
       }
     },
     /**
@@ -346,6 +366,9 @@ export default {
      * @param index
      */
     editConnection(checkId, index) {
+      /**
+       * 编辑连接
+       */
       const data = this.itemList[index]
       console.log(data)
       if (data.isActive) {
@@ -381,14 +404,19 @@ export default {
         modal: true
       })
     },
+    addNewIndex(){
+      /**
+       * 新增索引
+       */
+    },
     /**
-     * 重构后的右键菜单
+     * 重构后的父级右键菜单
      * @param item
      * @param index
      * @returns {boolean}
      */
     fatherOnContextmenu(item, index) {
-      ipcRenderer.send('send_message_load', '{ad:"1"}')
+      // ipcRenderer.send('send_message_load', '{ad:"1"}')
       this.clickId = index
       // 被点击的元素，在数据库中的ID
       let checkId = this.itemList[index].id
@@ -417,7 +445,16 @@ export default {
             }
           },
           {
-            label: "重新加载(R)",
+            label: "新增索引",
+            divided: true,
+            disabled: !item.isActive,
+            icon: "el-icon-circle-plus-outline",
+            onClick: () => {
+              this.addNewIndex()
+            }
+          },
+          {
+            label: "重新加载",
             icon: "el-icon-refresh",
             disabled: !item.isActive,
             onClick: () => {
@@ -456,10 +493,116 @@ export default {
       });
       return false;
     },
+    /**
+     * 双击子项目事件
+     * @param item 子项目的所有信息
+     * @param key 当前子项目所属的父key
+     */
     childDbClick(item, key) {
       this.sendMessage('addNewPage', {
         title: item.index,
         name: key,
+      })
+    },
+    /**
+     * 重构后的子级右键菜单
+     * @param item
+     * @param index
+     */
+    childOnContextmenu(item, index) {
+      this.clickId = index
+      this.$contextmenu({
+        items: [
+          {
+            label: "删除索引",
+            onClick: () => {
+              this.deleteIndex(item,index)
+            }
+          },
+          {
+            label: "编辑索引...",
+            divided: true,
+            icon: "el-icon-view",
+            onClick: () => {
+
+            }
+          },
+          {
+            label: "去除索引只读",
+            divided: true,
+            icon: "el-icon-view",
+            onClick: () => {
+              this.resetIndexReadOnly(item)
+            }
+          },
+          {
+            label: "重新加载",
+            icon: "el-icon-refresh",
+            disabled: !item.isActive,
+            onClick: () => {
+            }
+          },
+        ],
+        event,
+        customClass: "custom-class",
+        zIndex: 3,
+        minWidth: 230
+      });
+      return false;
+    },
+    deleteIndex(item,clickId){
+      let that = this
+      this.$confirm('此操作将永久删除该索引, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        that.elasticsearchResolver.deleteIndex(item.index,(callback) => {
+          console.log(callback)
+          if (callback.acknowledged){
+            this.$message({
+              type: 'success',
+              message: '已删除'
+            });
+            // 重置索引列表
+            that.initIndexList()
+          }else{
+            this.$message({
+              type: 'error',
+              message: '删除失败'
+            });
+          }
+        }, (error) => {
+          this.throwErrorMsg(error, item)
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
+    /**
+     * 去除索引只读
+     * @param item
+     */
+    resetIndexReadOnly(item){
+      console.log(item)
+      this.elasticsearchResolver.resetIndexReadOnly(item.index,(callback)=>{
+        if (callback.acknowledged){
+          this.$message({
+            type: 'success',
+            message: '重设成功'
+          });
+        }else{
+          this.$message({
+            type: 'error',
+            message: '重设失败'
+          });
+        }
+
+      },(error)=>{
+        this.throwErrorMsg(error, item)
       })
     }
   }

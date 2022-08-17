@@ -86,4 +86,41 @@ export default class RiskRes extends ProxyRestResolver {
         const api = this.resolve(url);
         this.get(api, callback, error);
     }
+
+    /**
+     * 删除索引
+     * @param indexName 索引名称
+     * @param callback  成功回调
+     * @param error     失败回调
+     */
+    deleteIndex(indexName, callback, error) {
+        let url = getCookie('baseUrl') + indexName
+        const api = this.resolve(url);
+        this.delete(api, callback, error);
+    }
+
+    /**
+     * 删除索引下的某个文档
+     * @param indexName
+     * @param docId
+     * @param callback
+     * @param error
+     */
+    deleteIndexItem(indexName, docId, callback, error) {
+        let url = getCookie('baseUrl') + indexName + '/_doc/' + docId
+        const api = this.resolve(url);
+        this.delete(api, callback, error);
+    }
+
+    /**
+     * 重设索引的只读问题
+     * @param indexName 索引名称
+     * @param callback  成功回调
+     * @param error     失败回调
+     */
+    resetIndexReadOnly(indexName, callback, error) {
+        let url = getCookie('baseUrl') + indexName + '/_settings'
+        const api = this.resolve(url,{body:{"index.blocks.read_only_allow_delete": null}});
+        this.put(api, callback, error)
+    }
 }
