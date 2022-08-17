@@ -42,7 +42,7 @@ export default {
           width: '40px',
           height: '40px',
           function: this.addNewConnection,
-          title: "连接",
+          title: "新建连接",
           isShow: true
         },
         {

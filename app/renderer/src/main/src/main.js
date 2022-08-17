@@ -15,6 +15,7 @@ import "tailwindcss/tailwind.css"
 import Contextmenu from "./components/functionalComponents/Contextmenu";
 import Submenu from "./components/functionalComponents/Submenu";
 import { COMPONENT_NAME } from "@/assets/js/constant";
+import '@/common/css/element-ui-common.css'
 
 
 Vue.config.productionTip = false

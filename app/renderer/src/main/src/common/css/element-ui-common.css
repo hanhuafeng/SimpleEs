@@ -1,0 +1,38 @@
+@media (prefers-color-scheme: dark) {
+    .el-message-box{
+        /*font-size: 30px;*/
+        color: rgb(0,32,237);
+        padding: 10px;
+        border-radius: 2em;
+        backdrop-filter: blur(20px);
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .el-message-box__content{
+        color: #343c4c;
+    }
+
+    .el-message-box__headerbtn .el-message-box__close {
+        color: #3a3c40;
+    }
+
+    .el-message-box__headerbtn .el-message-box__close:hover {
+        color: #dcff24;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    .el-message-box{
+        /*font-size: 30px;*/
+        color: rgb(0,32,237);
+        padding: 10px;
+        border-radius: 2em;
+        backdrop-filter: blur(20px);
+        /*background-color: rgba(255, 255, 255, 0.5);*/
+    }
+
+    .el-message-box__content{
+        color: #343c4c;
+    }
+}
+
