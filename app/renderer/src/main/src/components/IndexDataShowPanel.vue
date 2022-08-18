@@ -4,11 +4,17 @@
       <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
         <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
           <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50 dark:bg-asideBg">
+            <thead class="mbl-head">
             <tr>
-              <th scope="col"
-                  class="px-6 py-1 text-left text-base font-medium text-gray-500 tracking-wider dark:text-gray-300">
+              <th class="px-6 py-1 text-left text-base font-medium text-gray-500 tracking-wider dark:text-gray-300">
                 操作
+              </th>
+              <th class="px-6 py-1 text-left text-base font-medium text-gray-500 tracking-wider dark:text-gray-300">
+                _id
+                <el-tooltip class="item" effect="dark" content="单击_id的值可查看详细信息" placement="right">
+                  <i class="el-icon-info text-gray-400"></i>
+                </el-tooltip>
+
               </th>
               <th scope="col"
                   class="px-6 py-1 text-left text-base font-medium text-gray-500 tracking-wider dark:text-gray-300"
@@ -17,19 +23,28 @@
               </th>
             </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200 dark:bg-headBlackBg ">
+            <tbody class="divide-y divide-gray-200 mbl">
             <tr v-for="(items,index) in dataList" :key="index">
               <td class="text-sm px-6 py-1 whitespace-nowrap text-left text-gray-900 dark:text-gray-300">
                 <el-button size="mini" round type="danger" class="cursor-pointer" @click="deleteItem(items)">删除
                 </el-button>
               </td>
+              <td class="text-sm px-6 py-1 whitespace-nowrap text-left text-gray-900 dark:text-gray-300 cursor-pointer">
+                <a @click="showInfo(index)">{{ items[0] }}</a>
+              </td>
               <td class="text-sm px-6 py-1 whitespace-nowrap text-left text-gray-900 dark:text-gray-300"
-                  v-for="item in items">
+                  v-for="item in items.slice(1,items.length)">
                 <a>{{ item }}</a>
               </td>
             </tr>
             </tbody>
           </table>
+          <transition name="el-zoom-in-center">
+            <Message v-if="messageShow"
+                     v-model="messageShow"
+                     :info="userOperationInfo"
+                     :title="messageTitle"/>
+          </transition>
         </div>
       </div>
     </div>
@@ -39,6 +54,7 @@
 
 <script>
 import ElasticsearchResolver from '../handler/functionHandler/ElasticsearchResolver-7.3.2'
+import Message from '@/components/message/Message'
 
 /**
  * 索引数据展示页
@@ -46,6 +62,9 @@ import ElasticsearchResolver from '../handler/functionHandler/ElasticsearchResol
 export default {
   name: "IndexDataShowPanel",
   props: ['childIndexName'],
+  components: {
+    Message
+  },
   created() {
     this.elasticsearchResolver732 = new ElasticsearchResolver()
     this.initDataList()
@@ -54,7 +73,10 @@ export default {
     return {
       headers: [],
       dataList: [],
-      elasticsearchResolver732: null
+      elasticsearchResolver732: null,
+      messageShow: false,
+      userOperationInfo: {},
+      messageTitle:''
     }
   },
   methods: {
@@ -74,7 +96,8 @@ export default {
       const elasticsearchResolver732 = this.elasticsearchResolver732
       // 拿到所有的列名
       elasticsearchResolver732.getIndexColumnHeads(this.childIndexName, (callback) => {
-        that.headers = ['_id']
+        console.log(callback[that.childIndexName])
+        that.headers = []
         if (typeof callback !== 'undefined'
             && callback !== null
             && typeof callback[that.childIndexName] !== 'undefined'
@@ -84,11 +107,15 @@ export default {
           }
           // 再拿所有的条目
           elasticsearchResolver732.getIndexData(this.childIndexName, (callback) => {
+            console.log(callback.hits.hits)
             // that.dataList.push(callback.hits.hits)
             // console.log(that.dataList)
-            if (typeof callback !== 'undefined' && callback != null
-                && typeof callback.hits !== 'undefined' && callback.hits != null
-                && typeof callback.hits.hits !== 'undefined' && callback.hits.hits != null && callback.hits.hits.length !== 0)
+            if (typeof callback !== 'undefined'
+                && typeof callback.hits !== 'undefined'
+                && callback.hits != null
+                && typeof callback.hits.hits !== 'undefined'
+                && callback.hits.hits != null
+                && callback.hits.hits.length !== 0)
               callback.hits.hits.forEach((item) => {
                 let data = []
                 let sourceKey = []
@@ -124,7 +151,7 @@ export default {
       } else {
         try {
           this.$message.error('ES操作错误：' + error.response.data.error.reason);
-        }catch (e){
+        } catch (e) {
           this.$message.error('ES操作错误：' + error);
         }
       }
@@ -138,18 +165,15 @@ export default {
       }).then(() => {
         let _id = item[0]
         that.elasticsearchResolver732.deleteIndexItem(that.childIndexName, _id, (callback) => {
-          console.log(callback)
           if (callback.result === "deleted") {
             this.$message({
               type: 'success',
               message: '删除成功',
               duration: 2000,
-              onClose: function (){
+              onClose: function () {
                 that.initDataList()
               }
             });
-            // this.headers = []
-            // this.dataList = []
           } else {
             this.$message({
               type: 'error',
@@ -166,11 +190,39 @@ export default {
         });
       });
 
+    },
+    /**
+     * Message展示信息
+     * @param index
+     */
+    showInfo(index) {
+
+      let showInfo = {'_id':this.dataList[index][0]}
+      for (let i = 0; i < this.headers.length; i++) {
+        showInfo[this.headers[i]] = this.dataList[index][i+1]
+      }
+      this.userOperationInfo = showInfo
+      this.messageTitle = showInfo['_id']
+      this.messageShow = true
     }
   }
 }
 </script>
 
 <style scoped>
+@media (prefers-color-scheme: dark) {
+  .mbl {
+    /*backdrop-filter: blur(20px);*/
+    background-color: rgba(255, 255, 255, 0.08);
+  }
 
+  .mbl-head {
+    /*backdrop-filter: blur(20px);*/
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+
+}
 </style>

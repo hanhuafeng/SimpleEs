@@ -17,6 +17,10 @@ import Submenu from "./components/functionalComponents/Submenu";
 import { COMPONENT_NAME } from "@/assets/js/constant";
 import '@/common/css/element-ui-common.css'
 
+import JsonViewer from 'vue-json-viewer'
+
+Vue.use(JsonViewer);
+
 
 Vue.config.productionTip = false
 // Vue.use(ElementUI)
