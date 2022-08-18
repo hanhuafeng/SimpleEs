@@ -22,8 +22,8 @@
   "dependencies": {
     "axios": "^0.21.4",
     "babel-preset-env": "^1.7.0",
-    "jQuery": "^1.7.4",
     "jquery": "^3.6.0",
+    "jQuery": "^1.7.4",
     "js-base64": "^3.7.0",
     "sqlite3": "^5.0.2",
     "vue-axios": "^3.3.6",

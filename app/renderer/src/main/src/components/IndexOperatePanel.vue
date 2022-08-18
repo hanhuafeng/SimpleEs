@@ -515,33 +515,32 @@ export default {
         items: [
           {
             label: "删除索引",
+            icon: "el-icon-delete",
             onClick: () => {
               this.deleteIndex(item,index)
             }
           },
           {
             label: "编辑索引...",
-            divided: true,
-            icon: "el-icon-view",
+            icon: "el-icon-setting",
             onClick: () => {
-
+                this.$message.info('敬请期待')
             }
           },
           {
             label: "去除索引只读",
-            divided: true,
             icon: "el-icon-view",
             onClick: () => {
               this.resetIndexReadOnly(item)
             }
           },
           {
-            label: "重新加载",
-            icon: "el-icon-refresh",
-            disabled: !item.isActive,
+            label: "设置索引读取上限",
+            icon: "el-icon-setting\n",
             onClick: () => {
+              this.$message.info('敬请期待')
             }
-          },
+          }
         ],
         event,
         customClass: "custom-class",

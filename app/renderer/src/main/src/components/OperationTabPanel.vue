@@ -6,13 +6,19 @@
       </el-tab-pane>
       <el-tab-pane
           :key="item.name"
-          v-for="(item) in editableTabs"
+          v-for="(item, index) in editableTabs"
           :label="item.title"
           :name="item.name"
-          class="h-full overflow-y-auto overflow-x-hidden">
+          class="h-full overflow-y-auto overflow-x-hidden static bkg">
         <IndexDataShowPanel
             :childIndexName="item.title"
+            ref="indexDataShowPanel"
         ></IndexDataShowPanel>
+        <div class="absolute bottom-0 left-0 right-0 border-solid border-t h-10 rounded rounded-br-lg operation-div-bkg text-left pl-2">
+          <div class="inline-block"><i class="el-icon-circle-plus-outline text-white text-2xl	mt-1 operation-icon cursor-pointer"></i></div>
+          <div class="inline-block ml-2"><i class="el-icon-remove-outline text-white text-2xl	operation-icon cursor-pointer"></i></div>
+          <div class="inline-block ml-2" @click="reloadData(index)"><i class="el-icon-refresh text-white text-2xl operation-icon cursor-pointer"></i></div>
+        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -92,6 +98,9 @@ export default {
     sendMessage(key, msg) {
       bus.$emit(key, msg)
     },
+    reloadData(index){
+      this.$refs.indexDataShowPanel[index].initDataList()
+    }
   }
 }
 </script>
@@ -156,6 +165,18 @@ export default {
     background-color: #1e1e1e;
   }
 
+  .bkg {
+    background-image: url("../assets/pic/dark_bkg_1.jpeg");
+    /*filter: blur(1px);*/
+  }
+  .operation-div-bkg{
+    backdrop-filter: blur(15px);
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .operation-icon:hover{
+    color: #cc7643;
+  }
 }
 
 /*浅色*/
@@ -167,5 +188,9 @@ export default {
   /*.el-tabs--card>.el-tabs__header {*/
   /*  border-bottom: 1px solid gray;*/
   /*}*/
+  .bkg {
+    /*background-image: url("../assets/pic/light_bkg_1.jpeg");*/
+    /*filter: blur(1px);*/
+  }
 }
 </style>

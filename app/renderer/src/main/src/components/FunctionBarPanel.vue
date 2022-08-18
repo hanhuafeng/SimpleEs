@@ -78,6 +78,7 @@ export default {
      */
     functionDistributionHandler(functionId) {
       console.log(functionId)
+      this.$message.info('敬请期待')
     },
     /**
      * 打开一个新建连接信息的窗体
