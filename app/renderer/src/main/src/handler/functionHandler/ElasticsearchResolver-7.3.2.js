@@ -78,13 +78,14 @@ export default class RiskRes extends ProxyRestResolver {
     /**
      * 获取索引数据
      * @param indexName
+     * @param queryData
      * @param callback
      * @param error
      */
-    getIndexData(indexName, callback, error) {
+    getIndexData(indexName, queryData, callback, error) {
         let url = getCookie('baseUrl') + indexName + '/_search'
-        const api = this.resolve(url);
-        this.get(api, callback, error);
+        const api = this.resolve(url, {body: queryData});
+        this.post(api, callback, error);
     }
 
     /**
@@ -120,7 +121,45 @@ export default class RiskRes extends ProxyRestResolver {
      */
     resetIndexReadOnly(indexName, callback, error) {
         let url = getCookie('baseUrl') + indexName + '/_settings'
-        const api = this.resolve(url,{body:{"index.blocks.read_only_allow_delete": null}});
+        const api = this.resolve(url, {body: {"index.blocks.read_only_allow_delete": null}});
         this.put(api, callback, error)
+    }
+
+    /**
+     * 删除所有的文档
+     * @param indexName
+     * @param callback
+     * @param error
+     */
+    deleteAllDocs(indexName, callback, error) {
+        let url = getCookie('baseUrl') + indexName + '/docs/_delete_by_query'
+        const api = this.resolve(url, {
+            body: {
+                "query": {
+                    "match_all": {}
+                }
+            }
+        })
+        this.post(api, callback, error)
+    }
+
+
+    /**
+     * 批量删除文档
+     * @param indexName
+     * @param data
+     * @param callback
+     * @param error
+     */
+    deleteManyDocs(indexName, data, callback, error) {
+        let url = getCookie('baseUrl') + indexName + '/_delete_by_query'
+        const api = this.resolve(url, {body: {
+                "query": {
+                    "terms": {
+                        "_id": data
+                    }
+                }
+            }})
+        this.post(api, callback, error)
     }
 }

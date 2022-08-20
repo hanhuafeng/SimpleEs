@@ -69,12 +69,7 @@
                 if (typeof str == 'string') {
                     try {
                         let obj = JSON.parse(str);
-                        if (typeof obj == 'object' && obj) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-
+                        return !!(typeof obj == 'object' && obj);
                     } catch (e) {
                         console.log('error：' + str + '!!!' + e);
                         return false;
@@ -88,8 +83,7 @@
             drag: {
                 // 指令的定义
                 bind: function (el) {
-                    let odiv = el;   //获取当前元素
-                    let that = this;
+                    // let odiv = el;   //获取当前元素
                     el.onmousedown = (e) => {
                         //算出鼠标相对元素的位置
                         let disX = e.clientX - $('#panel').position().left-300;
