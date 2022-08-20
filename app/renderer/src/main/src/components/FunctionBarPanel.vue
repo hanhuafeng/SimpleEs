@@ -6,7 +6,7 @@
         v-for="(item, index) in functionImgContainer.filter(it => it.isShow === true)" @click="item.function(item.id)"
         :key="index">
       <div class="m-mask mt-1.5 flex flex-col items-center justify-center select-none hover:bg-gray-300">
-        <img :src="item.icon" :style="{ width:item.width,height:item.height, }" alt="">
+        <img :src="item.icon" style="object-fit: contain" :style="{ width:item.width,height:item.height, marginBottom: item.mb ? item.mb + 'px' : 0  }" alt="">
         <div class="text-sm text-white">
           <span class="text-purple-600 dark:text-indigo-200">{{ item.title }}</span>
         </div>
@@ -21,6 +21,7 @@
 import ConnectIcon from '../assets/pic/connect_icon.png'
 import ConnectIconYellow from '../assets/pic/connect_icon_yellow.png'
 import SQLTranceIcon from '../assets/pic/sql_trance_icon.png'
+import SettingIcon from '../assets/pic/setting.png'
 import {windowCreate} from '@/util/Plugins'
 
 const {ipcRenderer} = window.require('electron')
@@ -43,7 +44,8 @@ export default {
           height: '40px',
           function: this.addNewConnection,
           title: "新建连接",
-          isShow: true
+          isShow: true,
+          mb: 0
         },
         {
           icon: ConnectIconYellow,
@@ -51,7 +53,8 @@ export default {
           height: '50px',
           function: this.functionDistributionHandler,
           title: "连接",
-          isShow: false
+          isShow: false,
+          mb: 0
         },
         {
           id: 3,
@@ -60,7 +63,17 @@ export default {
           height: '40px',
           function: this.functionDistributionHandler,
           title: "SQL转换",
-          isShow: true
+          isShow: true,
+          mb: 0
+        },{
+          id: 4,
+          icon: SettingIcon,
+          width: '40px',
+          height: '40px',
+          function: this.functionDistributionHandler,
+          title: "系统设置",
+          isShow: true,
+          mb: 0
         }
       ],
       picSize: {

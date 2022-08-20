@@ -14,11 +14,6 @@
             :childIndexName="item.title"
             ref="indexDataShowPanel"
         ></IndexDataShowPanel>
-        <div class="absolute bottom-0 left-0 right-0 border-solid border-t h-10 rounded rounded-br-lg operation-div-bkg text-left pl-2">
-          <div class="inline-block"><i class="el-icon-circle-plus-outline text-white text-2xl	mt-1 operation-icon cursor-pointer"></i></div>
-          <div class="inline-block ml-2"><i class="el-icon-remove-outline text-white text-2xl	operation-icon cursor-pointer"></i></div>
-          <div class="inline-block ml-2" @click="reloadData(index)"><i class="el-icon-refresh text-white text-2xl operation-icon cursor-pointer"></i></div>
-        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -42,7 +37,7 @@ export default {
   data() {
     return {
       editableTabsValue: 'mainPage',
-      editableTabs: [],
+      editableTabs: []
     }
   },
   mounted() {
@@ -55,7 +50,7 @@ export default {
           break
         }
       }
-      if (!flag){
+      if (!flag) {
         that.editableTabs.push(param)
       }
       that.editableTabsValue = param.name
@@ -97,9 +92,6 @@ export default {
      */
     sendMessage(key, msg) {
       bus.$emit(key, msg)
-    },
-    reloadData(index){
-      this.$refs.indexDataShowPanel[index].initDataList()
     }
   }
 }
@@ -126,7 +118,7 @@ export default {
 .el-tabs__content {
   height: calc(100% - 41px);
   overflow: auto;
-  padding-bottom: 10px;
+  /*padding-bottom: 10px;*/
 }
 
 .el-tabs__nav-wrap {
@@ -169,12 +161,13 @@ export default {
     background-image: url("../assets/pic/dark_bkg_1.jpeg");
     /*filter: blur(1px);*/
   }
-  .operation-div-bkg{
+
+  .operation-div-bkg {
     backdrop-filter: blur(15px);
     background-color: rgba(255, 255, 255, 0.08);
   }
 
-  .operation-icon:hover{
+  .operation-icon:hover {
     color: #cc7643;
   }
 }
@@ -191,6 +184,10 @@ export default {
   .bkg {
     /*background-image: url("../assets/pic/light_bkg_1.jpeg");*/
     /*filter: blur(1px);*/
+  }
+
+  .operation-icon:hover {
+    color: #19d3e5;
   }
 }
 </style>
