@@ -78,6 +78,7 @@ class Window {
 
         console.log(options)
 
+        // Menu.setApplicationMenu(null) // null值取消顶部菜单栏
         let args = Object.assign({}, windowsCfg, options)
         console.log(args)
 
@@ -105,6 +106,7 @@ class Window {
 
         console.log(opt)
         let win = new BrowserWindow(args)
+        win.setMenu(null)
         console.log('窗口id：' + win.id)
         this.group[win.id] = {
             route: args.route,
