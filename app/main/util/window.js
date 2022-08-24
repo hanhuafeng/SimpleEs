@@ -3,6 +3,8 @@ const {app, BrowserWindow, screen, ipcMain,Tray,Menu} = require('electron')
 const isDev = require('electron-is-dev');
 const path = require('path')
 
+const userDataPath = app.getPath ("userData")
+
 const windowsCfg = {
     id: '', //唯一id
     title: '', //窗口标题
@@ -122,7 +124,12 @@ class Window {
             this.main = win
         }
         args.id = win.id
-        win.on('close', () => win.setOpacity(0))
+        win.on('close', () => {
+            win.setOpacity(0)
+            if (args.isMainWin){
+                app.quit()
+            }
+        })
 
         // 打开网址（加载页面）
         /**
@@ -149,7 +156,23 @@ class Window {
             win.loadURL(winUrl)
             // win.loadURL('http://localhost:18095/#/addNewConnection')
         } else {
-            win.loadFile(path.resolve(__dirname, '../renderer/pages/main/index.html'))
+            // win.loadFile(path.resolve(__dirname, '../../renderer/pages/main/index.html'))
+            // createProtocol('app')
+            let fileName = path.resolve(__dirname, '../../renderer/pages/main/index.html')
+            if (args.route){
+                // if (args.route.split("#").length == 2){
+                //     fileName+=args.route.split("#")[1].replace('/','')
+                // }
+                win.loadFile(fileName,{
+                    hash: args.route.split("#")[1].replace('/','')
+                })
+            }else{
+                win.loadFile(fileName)
+            }
+            // win.loadFile(fileName,{
+            //     hash: args.route.split("#")[1].replace('/','')
+            // })
+            // win.loadURL('app://./index.html')
         }
 
         win.once('ready-to-show', () => {
@@ -224,6 +247,7 @@ class Window {
                 if(this.group[Number(winId)]) delete this.group[Number(winId)]
             } else {
                 this.closeAllWindow()
+                app.quit()
             }
         })
 
@@ -297,4 +321,4 @@ class Window {
     }
 }
 
-module.exports = {windowsCfg,Window}
+module.exports = {windowsCfg,Window,userDataPath}

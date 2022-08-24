@@ -18,10 +18,10 @@
 
 
 <script>
-import ConnectIcon from '../assets/pic/connect_icon.png'
-import ConnectIconYellow from '../assets/pic/connect_icon_yellow.png'
-import SQLTranceIcon from '../assets/pic/sql_trance_icon.png'
-import SettingIcon from '../assets/pic/setting.png'
+import ConnectIcon from '@/assets/pic/connect_icon.png'
+import ConnectIconYellow from '@/assets/pic/connect_icon_yellow.png'
+import SQLTranceIcon from '@/assets/pic/sql_trance_icon.png'
+import SettingIcon from '@/assets/pic/setting.png'
 import {windowCreate} from '@/util/Plugins'
 
 const {ipcRenderer} = window.require('electron')
@@ -100,6 +100,7 @@ export default {
       let routeUrl = this.$router.resolve({
         path: "/addNewConnection",
       });
+      console.log(routeUrl)
       windowCreate(ipcRenderer, {
         isMainWin: false,
         route: routeUrl.href,

@@ -1,8 +1,8 @@
 import Vue from 'vue'
-import App from './App.vue'
-import './style/Common.css'
-import router from './router'
-import store from './store'
+import App from '@/App.vue'
+import '@/style/Common.css'
+import router from '@/router'
+import store from '@/store'
 // import ElementUI from 'element-ui'
 import '@/util/VueComponment'
 import 'element-ui/lib/theme-chalk/index.css'
@@ -12,8 +12,8 @@ import Axios from 'axios'
 import VueAxios from 'vue-axios'
 import "tailwindcss/tailwind.css"
 
-import Contextmenu from "./components/functionalComponents/Contextmenu";
-import Submenu from "./components/functionalComponents/Submenu";
+import Contextmenu from "@/components/functionalComponents/Contextmenu";
+import Submenu from "@/components/functionalComponents/Submenu";
 import { COMPONENT_NAME } from "@/assets/js/constant";
 import '@/common/css/element-ui-common.css'
 
@@ -63,7 +63,6 @@ function install(Vue) {
     Vue.prototype.$contextmenu = ContextmenuProxy;
 }
 install(Vue)
-
 
 new Vue({
     router,

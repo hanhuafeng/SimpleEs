@@ -1,8 +1,11 @@
 const sqllite = require('../sqlite')
+const win = require('./window')
+
+const dbPath = win.userDataPath+'/sq3.db'
 
 function initDb() {
     let lite = sqllite.getInstance()
-    lite.connect('sq3.db').then((res, err) => {
+    lite.connect(dbPath).then((res, err) => {
         // console.log(res)
         // console.log(err)
         if (res === 1) {
@@ -32,7 +35,7 @@ function initDb() {
  */
 function initConnectionInfo(event, arg) {
     let lite = sqllite.getInstance()
-    lite.connect('sq3.db').then((res, err) => {
+    lite.connect(dbPath).then((res, err) => {
         if (res === 1) {
             const sql = 'select * from main.es_database_info;'
             console.log(sql)
@@ -65,7 +68,7 @@ function deleteConnectionInfo(event, arg) {
         event.reply('connection_info_delete_result', '需要删除的ES连接编号异常')
         return
     }
-    lite.connect('sq3.db').then((res, err) => {
+    lite.connect(dbPath).then((res, err) => {
         if (res === 1) {
             const sql = 'delete from main.es_database_info where id = ' + arg + ';'
             console.log(sql)
@@ -99,7 +102,7 @@ function deleteConnectionInfo(event, arg) {
  */
 function addNewConnectionInfo(event, arg) {
     let lite = sqllite.getInstance()
-    lite.connect('sq3.db').then((res, err) => {
+    lite.connect(dbPath).then((res, err) => {
         if (res === 1) {
             let sql = "insert into main.es_database_info(title,username,passwd,base_url,es_version) values('" + arg.title + "','" + arg.username + "','" + arg.password + "','" + arg.connectionUrl + "','" + arg.version + "');"
             console.log(sql)
@@ -137,7 +140,7 @@ function addNewConnectionInfo(event, arg) {
 
 function updateConnectionInfo(event, arg) {
     let lite = sqllite.getInstance()
-    lite.connect('sq3.db').then((res, err) => {
+    lite.connect(dbPath).then((res, err) => {
         if (res === 1) {
             let sql = "update main.es_database_info set title='" + arg.title + "',username='" + arg.username + "',passwd='" + arg.password + "',base_url='" + arg.connectionUrl + "',es_version='" + arg.version + "' where id = " + arg.id + ";"
             console.log(sql)
