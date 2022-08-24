@@ -50,7 +50,7 @@
       <div class="rounded-2xl bg-white dark:bg-headBlackBg">
         <div class="h-0 md:h-40 sm:h-28 lg:h-48 xl:h-64 2xl:h-64">
           <div class="w-full text-left pl-3.5 pt-3">
-            <a class="text-xs truncate sm:text-xs md:text-xm  lg:text-base xl:text-lg 2xl:text-xl dark:text-white">内存使用</a>
+            <a class="text-xs truncate sm:text-xs md:text-xm  lg:text-base xl:text-lg 2xl:text-xl dark:text-white">平均内存使用</a>
           </div>
           <speed-chart-panel class="h-full relative" id="JvmPanel" :percent="memoryPercent"></speed-chart-panel>
         </div>
@@ -205,7 +205,7 @@ export default {
           bgColor: 'bg-gradient-to-r from-pink-300 via-purple-300 to-blue-400 dark:from-blue-700 dark:via-gray-500 dark:to-blue-800'
         }
       ],
-      tableHeaders: ['名称', '分片', 'CPU使用', '负载值', '内存使用情况', '磁盘可用空间'],
+      tableHeaders: ['名称', '分片', 'CPU使用', '系统负载', '内存使用情况', '磁盘可用空间'],
       // table表格中的ES节点信息
       esNodeData: [],
       // 集群基本信息
@@ -258,9 +258,8 @@ export default {
         console.log(error)
       });
       // Node节点信息
-      that.esNodeData = []
-      let nodeToInfo = {}
       that.elasticsearchResolver732.getAllocationInfo((data) => {
+        let nodeToInfo = {}
         if (data != null && data.length !== 0) {
           that.tranceDiskInfo(data)
           data.forEach((item) => {
@@ -270,6 +269,7 @@ export default {
           })
         }
         that.elasticsearchResolver732.getAllNodesInfo((callback) => {
+          that.esNodeData = []
           that.tranceMemory(callback)
           if (typeof callback != 'undefined' && callback != null && callback.length !== 0) {
             callback.forEach((item) => {

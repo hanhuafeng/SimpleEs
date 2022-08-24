@@ -1,4 +1,4 @@
-import {Tabs, TabPane, Container, Header, Aside, Main,Message,MessageBox,Button,Tooltip,Checkbox,CheckboxGroup} from 'element-ui'
+import {Tabs, TabPane, Container, Header, Aside, Main,Message,MessageBox,Button,Tooltip,Checkbox,CheckboxGroup,Popover,Loading} from 'element-ui'
 import Vue from 'vue'
 
 Vue.use(Tabs)
@@ -11,6 +11,8 @@ Vue.use(Button)
 Vue.use(Tooltip)
 Vue.use(Checkbox)
 Vue.use(CheckboxGroup)
+Vue.use(Popover)
+Vue.use(Loading)
 // Vue.use(MessageBox)
 // Vue.use(Message)
 Vue.prototype.$message = Message

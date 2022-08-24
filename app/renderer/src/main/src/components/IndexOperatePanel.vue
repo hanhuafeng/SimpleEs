@@ -1,5 +1,9 @@
 <template>
-  <div class="pb-10 border-t dark:border-black">
+  <div class="pb-10 border-t dark:border-black"
+       v-loading="loading"
+       element-loading-text="拼命加载中"
+       element-loading-spinner="el-icon-loading"
+       element-loading-background="rgba(0, 0, 0, 0.8)">
     <div v-for="(item,index) in itemList" :key="index">
       <div class="father-item" :class="checkClassStyleByClickId(index)" @click="clickItem(item,index)"
            @contextmenu.prevent="fatherOnContextmenu(item,index)"
@@ -23,12 +27,24 @@
              :key="childIndex"
              @dblclick="childDbClick(childItem,index+'-'+childIndex)"
              @click="clickItem(item,index+'-'+childIndex)"
-             @contextmenu.prevent="childOnContextmenu(childItem,index+'-'+childIndex)"
-        >
+             @contextmenu.prevent="childOnContextmenu(childItem,index+'-'+childIndex)">
           <!--          <img :src="imgContainer.IndexIcon" alt="">-->
           <!--          <a :title="childItem.index" :style="'color:'+statusIconColor[childItem.health]">{{ childItem.index }}</a>-->
-          <div class="status-bar" :style="'background-color:'+statusIconColor[childItem.health]"></div>
-          <a :title="childItem.index" class="dark:text-indexTitleTextColor dark:text-blue-50">{{ childItem.index }}</a>
+          <div>
+            <div class="status-bar" :style="'background-color:'+statusIconColor[childItem.health]"></div>
+            <a :title="childItem.index" class="dark:text-indexTitleTextColor dark:text-blue-50" :id="childItem.uuid">{{ childItem.index }}</a>
+          </div>
+          <div class="absolute el-popover el-popper" v-show="childItem.upperLimitVisible" :id="childItem.uuid+'a'">
+            <div class="">
+              <span>读取上限:</span>
+              <input class="w-12"/>
+              <div style="text-align: right; margin: 0; margin-top: 5px">
+                <el-button size="mini" type="text" @click="closeUpperLimitDiv(childItem)">取消</el-button>
+                <el-button size="mini" type="primary" @click="closeUpperLimitDiv(childItem)">确定</el-button>
+              </div>
+            </div>
+            <div class="popper__arrow"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -82,7 +98,8 @@ export default {
       isActive: false,
       selectItem:null,
       esConnectionInfo:null,
-      esClusterStatus: null
+      esClusterStatus: null,
+      loading: false
     }
   },
   created() {
@@ -213,6 +230,8 @@ export default {
      * @param id
      */
     itemDbClick(item, id) {
+      debugger
+      console.log(item)
       const that = this
       this.clickId = id
       delCookie('Authorization')
@@ -283,7 +302,9 @@ export default {
     throwErrorMsg(error, item) {
       console.log(error)
       // 取消loading载入
-      item.loading = false
+      if (item !== null && typeof item !== 'undefined'){
+        item.loading = false
+      }
       if (error.toString().indexOf('401') !== -1) {
         this.$message.error('ES认证错误：当前认证信息错误，请确认账号或密码是否有误');
       } else {
@@ -462,6 +483,22 @@ export default {
               this.itemDbClick(item, index)
             }
           },
+          {
+            label: "重设全部设置索引读取上限",
+            icon: "el-icon-view",
+            disabled: !item.isActive,
+            onClick:()=>{
+              this.openEditAllIndexMaxReadNumPage()
+            }
+          },
+          {
+            label: "解除全部索引只读",
+            icon: "el-icon-view",
+            disabled: !item.isActive,
+            onClick:()=>{
+              this.resetAllIndexReadOnly()
+            }
+          }
           // { label: "投射(C)...", divided: true },
           // {
           //   label: "使用网页翻译(T)",
@@ -538,7 +575,12 @@ export default {
             label: "设置索引读取上限",
             icon: "el-icon-setting\n",
             onClick: () => {
-              this.$message.info('敬请期待')
+              // const id = '#'+item.uuid
+              // $(id+'a').css('left', $(id).position().left + 'px')
+              // $(id+'a').css('top', $(id).position().top + 'px')
+              // item.upperLimitVisible = true
+              // this.$forceUpdate()
+              this.openEditIndexMaxReadNumPage(item)
             }
           }
         ],
@@ -586,7 +628,6 @@ export default {
      * @param item
      */
     resetIndexReadOnly(item){
-      console.log(item)
       this.elasticsearchResolver.resetIndexReadOnly(item.index,(callback)=>{
         if (callback.acknowledged){
           this.$message({
@@ -603,6 +644,99 @@ export default {
       },(error)=>{
         this.throwErrorMsg(error, item)
       })
+    },
+    resetAllIndexReadOnly(){
+      this.loading = true
+      this.elasticsearchResolver.resetAllIndexReadOnly((callback)=>{
+        if (callback.acknowledged){
+          this.$message({
+            type: 'success',
+            message: '重设成功'
+          });
+          this.loading = false
+        }else{
+          this.$message({
+            type: 'error',
+            message: '重设失败'
+          });
+          this.loading = false
+        }
+      },(error)=>{
+        this.throwErrorMsg(error)
+        this.loading = false
+      })
+    },
+    closeUpperLimitDiv(childItem){
+      childItem.upperLimitVisible = false
+      this.$forceUpdate()
+    },
+    /**
+     * 打开索引条数设置页面
+     */
+    openEditIndexMaxReadNumPage(item) {
+      let that = this
+      this.$prompt('请输入索引读取上限', '设置索引读取上限', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPattern: /^[0-9]*$/,
+        inputErrorMessage: '数字格式不正确'
+      }).then(({ value }) => {
+        that.elasticsearchResolver.modifyOneIndexMaxReadNum(item.index,value,(callback)=>{
+          if (callback.acknowledged){
+            this.$message({
+              type: 'success',
+              message: '当前索引最大读取数量已经重新设置为: ' + value
+            });
+          }else{
+            this.$message({
+              type: 'error',
+              message: '重设失败'
+            });
+          }
+        },(error)=>{
+          that.throwErrorMsg(error,item)
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消输入'
+        });
+      });
+    },
+    openEditAllIndexMaxReadNumPage(){
+      let that = this
+      this.$prompt('请输入索引读取上限', '设置索引读取上限', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPattern: /^[0-9]*$/,
+        inputErrorMessage: '数字格式不正确'
+      }).then(({ value }) => {
+        this.loading = true
+        that.elasticsearchResolver.modifyAllIndexMaxReadNum(value,(callback)=>{
+          if (callback.acknowledged){
+            this.$message({
+              type: 'success',
+              message: '所有索引最大读取数量已经重新设置为: ' + value
+            });
+            this.loading = false
+          }else{
+            this.$message({
+              type: 'error',
+              message: '重设失败'
+            });
+            this.loading = false
+          }
+        },(error)=>{
+          that.throwErrorMsg(error)
+          this.loading = false
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消输入'
+        });
+        this.loading = false
+      });
     }
   }
 }
@@ -687,7 +821,11 @@ export default {
 <style>
 /*深色*/
 @media (prefers-color-scheme: dark) {
-
+  .popper__arrow{
+    border-top-color: #ebeef5;
+    filter: drop-shadow(0 2px 12px rgba(0,0,0,.03));
+    border-width: 6px;
+  }
 }
 
 /*浅色*/

@@ -126,6 +126,17 @@ export default class RiskRes extends ProxyRestResolver {
     }
 
     /**
+     * 重设所有索引的只读问题
+     * @param callback  成功回调
+     * @param error     失败回调
+     */
+    resetAllIndexReadOnly(callback, error) {
+        let url = getCookie('baseUrl') + '_all/_settings'
+        const api = this.resolve(url, {body: {"index.blocks.read_only_allow_delete": null}});
+        this.put(api, callback, error)
+    }
+
+    /**
      * 删除所有的文档
      * @param indexName
      * @param callback
@@ -153,13 +164,46 @@ export default class RiskRes extends ProxyRestResolver {
      */
     deleteManyDocs(indexName, data, callback, error) {
         let url = getCookie('baseUrl') + indexName + '/_delete_by_query'
-        const api = this.resolve(url, {body: {
+        const api = this.resolve(url, {
+            body: {
                 "query": {
                     "terms": {
                         "_id": data
                     }
                 }
-            }})
+            }
+        })
         this.post(api, callback, error)
+    }
+
+    /**
+     * 重新设置索引最大读取文档的数量
+     * @param indexName 索引名字
+     * @param data      数据
+     * @param callback  成功回调
+     * @param error     失败回调
+     */
+    modifyOneIndexMaxReadNum(indexName, data, callback, error) {
+        let url = getCookie('baseUrl') + indexName + "/_settings?preserve_existing=true"
+        const api = this.resolve(url, {
+            body: {
+                "max_result_window": data
+            }
+        })
+        this.put(api, callback, error)
+    }
+
+    /**
+     * 重新设置索引最大读取文档的数量
+     * @param data      数据
+     * @param callback  成功回调
+     * @param error     失败回调
+     */
+    modifyAllIndexMaxReadNum(data, callback, error) {
+        let url = getCookie('baseUrl') + "_all/_settings"
+        const api = this.resolve(url, {
+            body: {"index.max_result_window": data}
+        })
+        this.put(api, callback, error)
     }
 }

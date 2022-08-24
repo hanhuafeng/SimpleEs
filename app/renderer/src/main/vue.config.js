@@ -6,10 +6,11 @@ function resolve(dir) {
     return path.join(__dirname, dir)
 }
 
+console.log(process)
 module.exports = {
     outputDir: '../../pages/main',
     /* 部署应用包的基本URL */
-    // publicPath: './',
+    publicPath: process.env.NODE_ENV === 'development' ? '' : '../main',
     /* 是否保存时 lint 代码 */
     lintOnSave: true,
     devServer: {
