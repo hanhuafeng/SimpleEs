@@ -9,8 +9,10 @@
     "start:main": "electron .",
     "start:render": "cd app/renderer/src/main && npm run serve",
     "rebuildBySqlite3": "electron-rebuild -f -w sqlite3",
-    "mac_build": "electron-packager . SimpleEs --platform=darwin --arch=x64 --icon=./Icon.icns --out=./out --app-version=1.0.0 --overwrite",
-    "win_build": "electron-packager . SimpleEs --platform=win32 --arch=x64 --out=./out --icon=./Icon.ico --app-version=1.0.0 --overwrite"
+    "mac_build": "electron-packager . SimpleEs --platform=darwin --arch=x64 --icon=./Icon.icns --out=./out --app-version=1.0.0 --overwrite -–asar",
+    "win_build": "electron-packager . SimpleEs --platform=win32 --arch=x64 --out=./out --icon=./Icon.ico --app-version=1.0.0 --overwrite -–asar",
+    "win32_build": "electron-packager . SimpleEs --platform=win32 --arch=ia32 --out=./out --icon=./Icon.ico --app-version=1.0.0 --overwrite -–asar",
+    "all_build": "electron-packager . SimpleEs --all --out=./out --icon=./Icon.ico --app-version=1.0.0 --overwrite"
   },
   "author": "",
   "license": "ISC",
