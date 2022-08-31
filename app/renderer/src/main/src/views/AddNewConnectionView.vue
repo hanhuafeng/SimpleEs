@@ -192,6 +192,7 @@ export default {
      * 测试能否访问成功
      */
     testConnect() {
+      let that = this
       this.checkConnectionUrl()
       if (this.connectionInfo.connectionUrlErrorMsg !== '') {
         this.$message.error(this.connectionInfo.connectionUrlErrorMsg)
@@ -208,8 +209,13 @@ export default {
         headers: headers
       }).then(resp => {
         console.log(resp)
+        that.$message({
+          message: '连接成功!',
+          type: 'success',
+        });
       }).catch(error => {
         console.log(error)
+        that.$message.error('连接失败，' + error);
       })
     }
   }

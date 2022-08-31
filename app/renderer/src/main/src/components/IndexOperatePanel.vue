@@ -230,7 +230,6 @@ export default {
      * @param id
      */
     itemDbClick(item, id) {
-      debugger
       console.log(item)
       const that = this
       this.clickId = id
@@ -448,6 +447,7 @@ export default {
             disabled: item.loading,
             onClick: () => {
               this.closeOrOpenConnection(index)
+              this.sendMessage('closePage',index)
             }
           },
           // { label: "前进(F)", disabled: true },
@@ -455,6 +455,7 @@ export default {
             label: "删除连接",
             onClick: () => {
               this.deleteConnection(checkId)
+              this.sendMessage('closePage',index)
             }
           },
           {

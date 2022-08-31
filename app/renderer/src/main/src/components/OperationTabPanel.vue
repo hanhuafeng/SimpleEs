@@ -9,6 +9,7 @@
           v-for="(item, index) in editableTabs"
           :label="item.title"
           :name="item.name"
+          @contextmenu.prevent="headRightContextmenu"
           class="h-full overflow-y-auto overflow-x-hidden static bkg">
         <IndexDataShowPanel
             :childIndexName="item.title"
@@ -55,11 +56,33 @@ export default {
       }
       that.editableTabsValue = param.name
     })
+    bus.$on('closePage', function (fatherId) {
+      let showList = []
+      for (let i = 0; i < that.editableTabs.length; i++) {
+        if (that.editableTabs[i].name.indexOf(fatherId + '-') === -1) {
+          showList.push(that.editableTabs[i])
+        }
+      }
+      that.editableTabs = showList
+      if (showList.length !==0){
+        that.editableTabsValue = showList[0].name
+      }else{
+        that.editableTabsValue = 'mainPage'
+      }
+    })
   },
   watch: {
     editableTabsValue: {// 深度监听，可监听到对象、数组的变化
       handler(val, oldVal) {
         console.log("editableTabsValue:" + val, oldVal);
+      },
+      deep: true // true 深度监听
+    },
+    editableTabs:{
+      handler(val, oldVal) {
+        let tabTopDom = document.getElementsByClassName('el-tabs__item is-top is-active is-closable')
+        console.log(tabTopDom)
+        tabTopDom.oncontextmenu = this.headRightContextmenu
       },
       deep: true // true 深度监听
     }
@@ -92,6 +115,45 @@ export default {
      */
     sendMessage(key, msg) {
       bus.$emit(key, msg)
+    },
+    headRightContextmenu() {
+      console.log('test')
+      this.$contextmenu({
+        items: [
+          {
+            label: "全部关闭",
+            icon: "el-icon-circle-close",
+            onClick: () => {
+              this.editableTabs = []
+              this.editableTabsValue = 'mainPage'
+            }
+          },
+          {
+            label: "关闭其他页面",
+            icon: "el-icon-circle-close",
+            onClick: () => {
+              this.$message.info('敬请期待')
+            }
+          },
+          {
+            label: "关闭右侧页面",
+            icon: "el-icon-right",
+            onClick: () => {
+            }
+          },
+          {
+            label: "关闭左侧页面",
+            icon: "el-icon-back",
+            onClick: () => {
+            }
+          }
+        ],
+        event,
+        customClass: "custom-class",
+        zIndex: 3,
+        minWidth: 230
+      });
+      return false;
     }
   }
 }
@@ -122,6 +184,11 @@ export default {
 }
 
 .el-tabs__nav-wrap {
+
+}
+
+.el-tabs__nav .el-tabs__item:nth-child(1) span {
+  display: none;
 
 }
 
