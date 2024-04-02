@@ -43,9 +43,9 @@ export default class RestResolver {
         return this
     }
 
-    getBaseHeader(){
+    getBaseHeader() {
         delete this.headers['Authorization']
-        if (getCookie('Authorization')!=null){
+        if (getCookie('Authorization') != null) {
             this.headers['Authorization'] = "Basic " + getCookie('Authorization')
         }
         return this
@@ -166,7 +166,16 @@ export default class RestResolver {
      * @param fail 遇到错误后的接口回调
      */
     post(api, success, fail) {
-        axios.post(api, this.body)
+        this.getBaseHeader()
+        axios(
+            {
+                method: 'post',
+                url: api,
+                responseType: 'json',
+                headers: this.headers,
+                data: this.body
+            }
+        )
             .then(resp => {
                 if (success) {
                     success(resp.data)
@@ -214,7 +223,13 @@ export default class RestResolver {
      * @param fail 遇到错误后的接口回调
      */
     put(api, success, fail) {
-        axios.put(api, this.body)
+        axios({
+            method: 'put',
+            url: api,
+            responseType: 'json',
+            headers: this.headers,
+            data: this.body
+        })
             .then(resp => {
                 if (success) {
                     success(resp.data)
@@ -234,7 +249,13 @@ export default class RestResolver {
      * @param fail 遇到错误后的接口回调
      */
     delete(api, success, fail) {
-        axios.delete(api)
+        axios.delete({
+            method: 'delete',
+            url: api,
+            responseType: 'json',
+            headers: this.headers,
+            data: this.body
+        })
             .then(resp => {
                 if (success !== undefined) {
                     success(resp.data)
