@@ -172,8 +172,7 @@ export default class RestResolver {
                 method: 'post',
                 url: api,
                 responseType: 'json',
-                headers: this.headers,
-                data: this.body
+                headers: this.headers
             }
         )
             .then(resp => {
@@ -223,12 +222,12 @@ export default class RestResolver {
      * @param fail 遇到错误后的接口回调
      */
     put(api, success, fail) {
+        this.getBaseHeader()
         axios({
             method: 'put',
             url: api,
             responseType: 'json',
-            headers: this.headers,
-            data: this.body
+            headers: this.headers
         })
             .then(resp => {
                 if (success) {
@@ -249,13 +248,17 @@ export default class RestResolver {
      * @param fail 遇到错误后的接口回调
      */
     delete(api, success, fail) {
-        axios({
+        this.getBaseHeader()
+        let axiosData = {
             method: 'delete',
             url: api,
             responseType: 'json',
-            headers: this.headers,
-            data: this.body
-        })
+            headers: this.headers
+        }
+        if (this.body === null || this.body === undefined || this.body.length === 0) {
+            delete axiosData.data
+        }
+        axios(axiosData)
             .then(resp => {
                 if (success !== undefined) {
                     success(resp.data)
@@ -269,12 +272,12 @@ export default class RestResolver {
     }
 
     deleteData(api, success, fail) {
+        this.getBaseHeader()
         axios({
             method: 'delete',
             url: api,
             responseType: 'json',
-            headers: this.headers,
-            data: this.body
+            headers: this.headers
         })
             .then(resp => {
                 if (success !== undefined) {
