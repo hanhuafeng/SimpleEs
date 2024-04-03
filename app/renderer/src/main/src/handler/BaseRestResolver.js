@@ -249,7 +249,7 @@ export default class RestResolver {
      * @param fail 遇到错误后的接口回调
      */
     delete(api, success, fail) {
-        axios.delete({
+        axios({
             method: 'delete',
             url: api,
             responseType: 'json',
@@ -269,7 +269,13 @@ export default class RestResolver {
     }
 
     deleteData(api, success, fail) {
-        axios.delete(api, {data: this.body})
+        axios({
+            method: 'delete',
+            url: api,
+            responseType: 'json',
+            headers: this.headers,
+            data: this.body
+        })
             .then(resp => {
                 if (success !== undefined) {
                     success(resp.data)
