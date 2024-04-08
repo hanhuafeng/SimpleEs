@@ -94,6 +94,7 @@ export default class RestResolver {
      * @param index 如果有分页带入参数
      */
     resolve(api, args = {}, index = -1) {
+        this.body = null
         // 只有当前请求为分页请求时才对参数进行缓存
         if (index !== -1) {
             this.lastApi = api
@@ -167,14 +168,17 @@ export default class RestResolver {
      */
     post(api, success, fail) {
         this.getBaseHeader()
-        axios(
-            {
-                method: 'post',
-                url: api,
-                responseType: 'json',
-                headers: this.headers
-            }
-        )
+        let axiosData = {
+            method: 'post',
+            url: api,
+            responseType: 'json',
+            headers: this.headers,
+            data: this.body
+        }
+        if (this.body === null || this.body === undefined || this.body.length === 0) {
+            delete axiosData.data
+        }
+        axios(axiosData)
             .then(resp => {
                 if (success) {
                     success(resp.data)
@@ -194,15 +198,18 @@ export default class RestResolver {
      * @param fail 遇到错误后的接口回调
      */
     get(api, success, fail) {
-        // console.log(api)
-        // console.log(this.headers)
         this.getBaseHeader()
-        axios({
+        let axiosData = {
             method: 'get',
             url: api,
             responseType: 'json',
-            headers: this.headers
-        })
+            headers: this.headers,
+            data: this.body
+        }
+        if (this.body === null || this.body === undefined || this.body.length === 0) {
+            delete axiosData.data
+        }
+        axios(axiosData)
             .then(resp => {
                 if (success !== undefined) {
                     success(resp.data)
@@ -223,12 +230,17 @@ export default class RestResolver {
      */
     put(api, success, fail) {
         this.getBaseHeader()
-        axios({
+        let axiosData = {
             method: 'put',
             url: api,
             responseType: 'json',
-            headers: this.headers
-        })
+            headers: this.headers,
+            data: this.body
+        }
+        if (this.body === null || this.body === undefined || this.body.length === 0) {
+            delete axiosData.data
+        }
+        axios(axiosData)
             .then(resp => {
                 if (success) {
                     success(resp.data)
@@ -273,12 +285,17 @@ export default class RestResolver {
 
     deleteData(api, success, fail) {
         this.getBaseHeader()
-        axios({
+        let axiosData = {
             method: 'delete',
             url: api,
             responseType: 'json',
-            headers: this.headers
-        })
+            headers: this.headers,
+            data: this.body
+        }
+        if (this.body === null || this.body === undefined || this.body.length === 0) {
+            delete axiosData.data
+        }
+        axios(axiosData)
             .then(resp => {
                 if (success !== undefined) {
                     success(resp.data)
