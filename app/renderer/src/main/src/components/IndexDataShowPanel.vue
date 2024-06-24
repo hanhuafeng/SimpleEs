@@ -279,12 +279,12 @@ export default {
     },
     prePage() {
       if (this.nowPage !== 1) {
-        this.nowPage = this.nowPage - 1
+        this.nowPage = parseInt(this.nowPage) - 1
         this.initDataList()
       }
     },
     nextPage() {
-      this.nowPage = this.nowPage + 1
+      this.nowPage = parseInt(this.nowPage) + 1
       this.initDataList()
     },
     /**
